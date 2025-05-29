@@ -2,10 +2,6 @@ import argparse
 import importlib
 import os
 from pathlib import Path
-
-#
-from .uv import UvManager
-
 # 
 
 FRAMEWORKS_PATH = Path(__file__).parent / "frameworks"
@@ -30,7 +26,6 @@ class Main:
         #
         self.args = self.parser.parse_args()
         #
-        self.UvManager = UvManager()
         self.framework_manager = self._load_framework_manager()
 
     def _discover_frameworks(self):
@@ -50,13 +45,11 @@ class Main:
         
         return manager_class(name=self.args.name)
 
-    def run(self):      
-        self.UvManager.check_for_venv()
-        #
+    def run(self):
         example_id = 1 if self.args.example is None else self.args.example
         #
-        if hasattr(self.framework_manager, "check"):
-            self.framework_manager.check(version=self.args.version)
+        if hasattr(self.framework_manager, "install_framework"):
+            self.framework_manager.install_framework(version=self.args.version)
         
         if hasattr(self.framework_manager, "create_example"):
             self.framework_manager.create_example(self.args.name, example_id)

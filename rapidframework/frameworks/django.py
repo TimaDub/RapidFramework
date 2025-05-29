@@ -5,7 +5,7 @@ from os import chdir
 
 class DjangoManager(Template):
     def __init__(self, **kwargs):
-        super().__init__(framework_name="django", **kwargs)
+        super().__init__(**kwargs)
 
     def run_manage(self, commands: list):
         chdir(f"{self.source_dir}/{self.project_name}")

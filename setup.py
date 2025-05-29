@@ -3,11 +3,10 @@ from setuptools import setup, find_packages
 
 setup(
     name="rapidframework-lib",
-    version="1.0.2",
+    version="1.0.5",
     packages=find_packages(),
     install_requires=[
-        "msgspec",
-        "uv"
+        "msgspec"
     ],
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
@@ -15,5 +14,9 @@ setup(
         'console_scripts': [
             'rapidframework=rapidframework.main:main_entry_point',
         ],
+    },
+    include_package_data=True,
+    package_data={
+        "rapidframework": ["**/*"],
     },
 )

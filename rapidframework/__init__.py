@@ -3,6 +3,6 @@ from .frameworks import DjangoManager as DjangoManager
 from .frameworks import FastapiManager as FastapiManager
 
 from .config import Config as Config
-from .uv import UvManager as UvManager
+from .config import AutoManager as AutoManager
 
 __version__ = '0.0.1'

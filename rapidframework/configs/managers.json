@@ -1,0 +1,29 @@
+{
+    "managers": {
+        "pip": {
+            "install": "install",
+            "uninstall": "uninstall",
+            "list": "freeze"
+        },
+        "conda": {
+            "install": "install",
+            "uninstall": "uninstall",
+            "list": "list"
+        },
+        "uv": {
+            "install": "add",
+            "uninstall": "remove",
+            "list": "pip list"
+        },
+        "pyenv": {
+            "install": "install",
+            "uninstall": "uninstall",
+            "list": "versions"
+        },
+        "poetry": {
+            "install": "add",
+            "uninstall": "remove",
+            "list": "show"
+        }
+    }
+}
