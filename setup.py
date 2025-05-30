@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="rapidframework-lib",
-    version="1.0.5",
+    version="1.0.7.2",
     packages=find_packages(),
     install_requires=[
         "msgspec"
