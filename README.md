@@ -20,7 +20,7 @@ rapidframework fastapi --name App --version 0.115.12 --example 1
 
 ## Features
 
-- 📦 Create projects based on popular frameworks: **Flask**, **Django**, **FastAPI**.
+- 📦 Create projects based on popular frameworks: **Flask**, **Django**, **FastAPI**, etc.
 - 🎨 Support for custom templates via the `Template` class.
 - 🚀 Built-in examples to get started quickly.
 

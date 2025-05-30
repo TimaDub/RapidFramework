@@ -43,23 +43,20 @@ class Main:
         #
         self.args = self.parser.parse_args()
         #
-        self.framework_manager = self._load_framework_manager()
+        self.framework_manager = find_manager_class(self.args.framework)
 
     def _discover_frameworks(self):
         return sorted(set([cls.__name__.removesuffix("Manager").lower() for cls in all_subclasses(Template)]))
 
-    def _load_framework_manager(self):
-        return find_manager_class(self.args.framework)(name=self.args.name)
-
     def run(self):
         example_id = 1 if self.args.example is None else self.args.example
         #
+        framework = self.framework_manager(self.args.name)
+        #
         if hasattr(self.framework_manager, "install_framework"):
-            self.framework_manager.install_framework(version=self.args.version)
-        
+            framework.install_framework(version=self.args.version)
         if hasattr(self.framework_manager, "create_example"):
-            self.framework_manager.create_example(self.args.name, example_id)
-
+            framework.create_example(example_id)
 
 def main_entry_point():
     Main().run()
