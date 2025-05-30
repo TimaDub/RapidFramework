@@ -1,4 +1,4 @@
-from .template import Template
+from ..template import Template
 from subprocess import run
 from os import chdir
 

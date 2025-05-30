@@ -1,7 +1,7 @@
-from .template import Template
+from ..template import Template
 
 
-class Cherrypymanager(Template):
+class CherryPyManager(Template):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
     

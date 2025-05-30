@@ -1,7 +1,7 @@
-from .template import Template
+from ..template import Template
 
 
-class Turbogears2Manager(Template):
+class TurboGears2Manager(Template):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
     

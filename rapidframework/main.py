@@ -1,8 +1,25 @@
 import argparse
-import importlib
-import os
 from pathlib import Path
+from . import Template
 # 
+import gc
+
+def all_subclasses(cls):
+    subclasses = cls.__subclasses__()
+    for subclass in subclasses:
+        subclasses += all_subclasses(subclass)
+    return subclasses
+
+def find_manager_class(base_name: str):
+    base_name_lower = base_name.lower()
+    target_suffix = "manager"
+
+    for obj in gc.get_objects():
+        if isinstance(obj, type):
+            cls_name = obj.__name__
+            if cls_name.lower() == base_name_lower + target_suffix:
+                return obj
+    return None
 
 FRAMEWORKS_PATH = Path(__file__).parent / "frameworks"
 
@@ -29,21 +46,10 @@ class Main:
         self.framework_manager = self._load_framework_manager()
 
     def _discover_frameworks(self):
-        frameworks = []
-        for file in os.listdir(FRAMEWORKS_PATH):
-            if file.endswith(".py") and file != "__init__.py":
-                framework_name = file.removesuffix('.py').lower()
-                frameworks.append(framework_name)
-        return frameworks
+        return [cls.__name__.removesuffix("Manager").lower() for cls in all_subclasses(Template)]
 
     def _load_framework_manager(self):
-        module_name = f"rapidframework.frameworks.{self.args.framework}"
-        class_name = f"{self.args.framework.capitalize()}Manager"
-        
-        module = importlib.import_module(module_name)
-        manager_class = getattr(module, class_name)
-        
-        return manager_class(name=self.args.name)
+        return find_manager_class(self.args.framework)(name=self.args.name)
 
     def run(self):
         example_id = 1 if self.args.example is None else self.args.example

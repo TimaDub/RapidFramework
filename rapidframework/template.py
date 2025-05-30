@@ -1,6 +1,6 @@
 from os import path
-from ..config import AutoManager
-from ..config import Config
+from .config import AutoManager
+from .config import Config
 
 
 cfg = Config()
@@ -42,12 +42,11 @@ class Template:
             cfg.create_files(extra_files)
 
     def create_example(self, name, example_id):
-        print(self.framework_name)
         from pkgutil import get_data
 
         example_code = get_data(
             "rapidframework",
-            f"frameworks/examples/{self.framework_name}_example_{example_id}.py",
+            f"frameworks/examples/{self.framework_name}_{example_id}.py",
         ).decode("utf-8")
 
         with open(
