@@ -46,7 +46,7 @@ class Main:
         self.framework_manager = self._load_framework_manager()
 
     def _discover_frameworks(self):
-        return [cls.__name__.removesuffix("Manager").lower() for cls in all_subclasses(Template)]
+        return sorted(set([cls.__name__.removesuffix("Manager").lower() for cls in all_subclasses(Template)]))
 
     def _load_framework_manager(self):
         return find_manager_class(self.args.framework)(name=self.args.name)
