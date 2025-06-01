@@ -19,7 +19,7 @@ def find_manager_class(base_name: str):
             cls_name = obj.__name__
             if cls_name.lower() == base_name_lower + target_suffix:
                 return obj
-    return None
+    raise Exception(f"Manager class for '{base_name}' not found. Ensure it is defined and imported correctly.")
 
 FRAMEWORKS_PATH = Path(__file__).parent / "frameworks"
 
@@ -43,20 +43,18 @@ class Main:
         #
         self.args = self.parser.parse_args()
         #
-        self.framework_manager = find_manager_class(self.args.framework)
+        self.framework_manager: type = find_manager_class(self.args.framework)
 
     def _discover_frameworks(self):
         return sorted(set([cls.__name__.removesuffix("Manager").lower() for cls in all_subclasses(Template)]))
 
     def run(self):
-        example_id = 1 if self.args.example is None else self.args.example
-        #
         framework = self.framework_manager(self.args.name)
         #
         if hasattr(self.framework_manager, "install_framework"):
             framework.install_framework(version=self.args.version)
         if hasattr(self.framework_manager, "create_example"):
-            framework.create_example(example_id)
+            framework.create_example(1 if self.args.example is None else self.args.example)
 
 def main_entry_point():
     Main().run()

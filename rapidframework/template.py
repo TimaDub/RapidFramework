@@ -17,11 +17,18 @@ class Template:
 
         bases = [base for base in cls.__mro__[1:] if issubclass(base, Template)]
         
-        cls.extra_libs = sum([getattr(base, "extra_libs", []) for base in reversed(bases)], []) + cls.extra_libs
-        cls.extra_dirs = sum([getattr(base, "extra_dirs", []) for base in reversed(bases)], []) + cls.extra_dirs
-        cls.extra_files = sum([getattr(base, "extra_files", []) for base in reversed(bases)], []) + cls.extra_files
+        seen = set()
+        for attr in ["extra_libs", "extra_dirs", "extra_files"]:
+            values = []
+            for base in reversed(bases):
+                if base not in seen:
+                    seen.add(base)
+                    values += getattr(base, attr, [])
+            values += getattr(cls, attr, [])
+            setattr(cls, attr, values)
 
         cls.example = getattr(cls, "example", True)
+        
 
     def __init__(
         self,
@@ -51,8 +58,8 @@ class Template:
         #
         self.setup_framework()
 
-    def setup_framework(self, source_dir: list = None, extra_dirs: list = None, extra_files: list = None):
-        source_dir = source_dir or self.source_dir
+    def setup_framework(self, _source_dir: Optional[str] = None, extra_dirs: Optional[list] = None, extra_files: Optional[list] = None):
+        source_dir: str = _source_dir or self.source_dir
         #
         dirs = (extra_dirs or []) + self.extra_dirs
         files = (extra_files or []) + self.extra_files
@@ -69,11 +76,13 @@ class Template:
             example_code = get_data(
                 "rapidframework",
                 f"frameworks/examples/{self.framework_name}_{example_id}.py",
-            ).decode("utf-8")
-
+            )
+            if not example_code:
+                raise Exception(f"Example {example_id} not found for {self.framework_name} framework.")
+            
             with open(
                 path.join(self.source_dir, self.name + ".py"), "w", encoding="utf-8"
             ) as example_file:
-                example_file.write(example_code)
+                example_file.write(example_code.decode("utf-8"))
         else:
             raise Exception("Example method is'n allowed for this framework !")
