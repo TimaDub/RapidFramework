@@ -1,33 +1,18 @@
-# from ..template import Template
-# from subprocess import run
-# from os import chdir
+from ..template import Template
+import os
+import pathlib
+from subprocess import run
 
 
-# class DjangoManager(Template):
-#     extra_libs = ["Pillow"]
-#     example = False
-
-#     def run_manage(self, commands: list):
-#         manage_py = f"{self.source_dir}/{self.project_name}/manage.py"
-#         for command in commands:
-#             full_command = ["python", manage_py] + command.strip().split(" ")
-#             run(full_command, check=True)
-
-#     def setup_framework(self):
-#         run([
-#             "python", "-m", "django", "startproject",
-#             self.project_name, self.source_dir
-#         ], check=True)
-
-#         chdir(f"{self.source_dir}/{self.project_name}")
-#         self.run_manage([f"startapp {self.name}", "makemigrations", "migrate"])
-
-#         self.extra_files.append(f"{self.project_name}/{self.name}/urls.py")
-
-#         return super().setup_framework(
-#             source_dir=f"{self.source_dir}/{self.project_name}/{self.name}",
-#             extra_files=self.extra_files
-#         ) 
-"""
-The class is being redeveloped for better performance and capabilities
-    """
+class DjangoManager(Template):
+    extra_libs = ["Pillow", "djangorestframework", "django-cors-headers", \
+        "celery", "django-redis", "redis", "django-allauth", "django-crispy-forms", "django-environ", \
+        "django-extensions", "gunicorn", "whitenoise", "django-configurations", "django-debug-toolbar"]
+    example = True
+    
+    def create_example(self, example_id) -> None: 
+        package_dir = pathlib.Path(__file__).resolve().parent
+        example_folder_path = package_dir / "examples" / f"{self.framework_name}_{example_id}"     
+        
+        if os.path.isdir(example_folder_path):
+            run(["django-admin", "startproject", f"--template={example_folder_path}", self.name])

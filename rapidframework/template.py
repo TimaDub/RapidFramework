@@ -69,10 +69,10 @@ class Template:
         if files:
             cfg.create_files(files)
 
-    def create_example(self, example_id):
-        if self.__class__.example:
+    def create_example(self, example_id) -> None:
+        if self.example:
             from pkgutil import get_data
-
+            
             example_code = get_data(
                 "rapidframework",
                 f"frameworks/examples/{self.framework_name}_{example_id}.py",
