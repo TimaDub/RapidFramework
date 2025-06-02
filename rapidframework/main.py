@@ -52,9 +52,9 @@ class Main:
         framework = self.framework_manager(self.args.name)
         #
         if hasattr(self.framework_manager, "install_framework"):
-            framework.install_framework(version=self.args.version)
+            framework.install_framework(_version=self.args.version)
         if hasattr(self.framework_manager, "create_example"):
-            framework.create_example(1 if self.args.example is None else self.args.example)
+            framework.create_example(self.args.example or 1)
 
 def main_entry_point():
     Main().run()

@@ -1,6 +1,6 @@
 from ..template import Template
-import os
-import pathlib
+from os import path
+from pathlib import Path
 from subprocess import run
 
 
@@ -11,8 +11,8 @@ class DjangoManager(Template):
     example = True
     
     def create_example(self, example_id) -> None: 
-        package_dir = pathlib.Path(__file__).resolve().parent
+        package_dir = Path(__file__).resolve().parent
         example_folder_path = package_dir / "examples" / f"{self.framework_name}_{example_id}"     
         
-        if os.path.isdir(example_folder_path):
+        if path.isdir(example_folder_path):
             run(["django-admin", "startproject", f"--template={example_folder_path}", self.name])

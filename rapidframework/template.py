@@ -2,28 +2,33 @@ from os import path
 from .config import AutoManager
 from .config import Config
 from typing import Optional, List
+from copy import deepcopy
+
 
 cfg = Config()
 
 class Template:
-    extra_libs: List[str] = []
-    extra_dirs: List[str] = []
-    extra_files: List[str] = []
+    extra_libs: List[str]
+    extra_dirs: List[str]
+    extra_files: List[str]
     example: bool = True
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        cls.framework_name = cls.__name__.lower().replace("manager", "")
+        cls.framework_name = cls.__name__.lower().removesuffix("manager")
 
         bases = [base for base in cls.__mro__[1:] if issubclass(base, Template)]
         
+        fields = ["extra_libs", "extra_dirs", "extra_files"]
+        
         seen = set()
-        for attr in ["extra_libs", "extra_dirs", "extra_files"]:
-            values = []
-            for base in reversed(bases):
-                if base not in seen:
-                    seen.add(base)
-                    values += getattr(base, attr, [])
+        for attr in fields:
+            values = [
+                item
+                for base in reversed(bases)
+                if base not in seen and not seen.add(base)
+                for item in getattr(base, attr, [])
+            ]
             values += getattr(cls, attr, [])
             setattr(cls, attr, values)
 
@@ -34,55 +39,42 @@ class Template:
         self,
         name: str,
         framework_name: Optional[str] = None,
-        source_dir = cfg.source_dir,
-        project_name = cfg.project_name
+        source_dir: Optional[str] = None,
+        project_name: Optional[str] = None
     ):
         self.name = name
+        self.source_dir = source_dir or cfg.source_dir
+        self.project_name = project_name or cfg.project_name
         self.framework_name = framework_name or self.__class__.framework_name
-        self.source_dir = source_dir
-        self.project_name = project_name
         self.AutoManager = AutoManager()
-        self.extra_libs = self.__class__.extra_libs
-        self.extra_dirs = self.__class__.extra_dirs
-        self.extra_files = self.__class__.extra_files
+        #
+        self.extra_libs = deepcopy(self.__class__.extra_libs)
+        self.extra_dirs = deepcopy(self.__class__.extra_dirs)
+        self.extra_files = deepcopy(self.__class__.extra_files)
         self.example = self.__class__.example
         
-    def install_framework(self, **kwargs):
-        version = f"=={kwargs.get('version')}" if kwargs.get('version') else ""
-        libs_to_install: list = kwargs.get("libs") or []
-        #
-        libs_to_install.extend([f"{self.framework_name}{version}"])
-        libs_to_install.extend(self.extra_libs)
-        #
-        self.AutoManager.install_libs(libs_to_install)
-        #
-        self.setup_framework()
+    def install_framework(self, _version: Optional[str] = None):
+        self.AutoManager.install_libs(
+            [f"{self.framework_name}=={_version}"] if _version else [self.framework_name]
+            + self.extra_libs)
+        self._setup_framework()
 
-    def setup_framework(self, _source_dir: Optional[str] = None, extra_dirs: Optional[list] = None, extra_files: Optional[list] = None):
-        source_dir: str = _source_dir or self.source_dir
-        #
-        dirs = (extra_dirs or []) + self.extra_dirs
-        files = (extra_files or []) + self.extra_files
-        #
-        if dirs:
-            cfg.create_dirs(source_dir, dirs)
-        if files:
-            cfg.create_files(files)
+    def _setup_framework(self):
+        if self.extra_dirs:
+            cfg.create_dirs(self.source_dir, self.extra_dirs)
+        if self.extra_files:
+            cfg.create_files(self.extra_files)
 
     def create_example(self, example_id) -> None:
         if self.example:
             from pkgutil import get_data
             
-            example_code = get_data(
-                "rapidframework",
-                f"frameworks/examples/{self.framework_name}_{example_id}.py",
-            )
-            if not example_code:
-                raise Exception(f"Example {example_id} not found for {self.framework_name} framework.")
+            example_code = get_data("rapidframework", f"frameworks/examples/{self.framework_name}_{example_id}.py")
             
-            with open(
-                path.join(self.source_dir, self.name + ".py"), "w", encoding="utf-8"
-            ) as example_file:
-                example_file.write(example_code.decode("utf-8"))
+            if example_code is None:
+                raise FileNotFoundError(f"Example {example_id} not found for {self.framework_name} framework.")
+
+            with open(path.join(self.source_dir, f"{self.name}.py"), "w", encoding="utf-8") as f:
+                f.write(example_code.decode("utf-8"))
         else:
-            raise Exception("Example method is'n allowed for this framework !")
+            raise NotImplementedError(f"Example creation is not implemented for {self.framework_name} framework.")

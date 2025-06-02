@@ -57,7 +57,7 @@ class AutoManager:
     _instance = None    
     _decoder = json.Decoder(type=_ConfigFormat, strict=True)
     
-    def __new__(cls, config_name: str = "managers.json") -> Self:
+    def __new__(cls) -> Self:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
