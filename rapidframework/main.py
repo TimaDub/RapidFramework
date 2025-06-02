@@ -1,31 +1,26 @@
 import argparse
 from pathlib import Path
 from . import Template
-# 
-import gc
 
-def all_subclasses(cls):
+def all_subclasses(cls) -> list[type]:
     subclasses = cls.__subclasses__()
     for subclass in subclasses:
         subclasses += all_subclasses(subclass)
     return subclasses
 
-def find_manager_class(base_name: str):
-    base_name_lower = base_name.lower()
-    target_suffix = "manager"
-
-    for obj in gc.get_objects():
-        if isinstance(obj, type):
-            cls_name = obj.__name__
-            if cls_name.lower() == base_name_lower + target_suffix:
-                return obj
+def find_manager_class(base_name: str) -> type:
+    base_name_lower = base_name.lower() + "manager"
+    for cls in all_subclasses(Template):
+        if cls.__name__.lower() == base_name_lower:
+            return cls
     raise Exception(f"Manager class for '{base_name}' not found. Ensure it is defined and imported correctly.")
+
 
 FRAMEWORKS_PATH = Path(__file__).parent / "frameworks"
 
 
 class Main:
-    def __init__(self):
+    def __init__(self) -> None:
         #
         self.available_frameworks = self._discover_frameworks()
         #
@@ -45,10 +40,10 @@ class Main:
         #
         self.framework_manager: type = find_manager_class(self.args.framework)
 
-    def _discover_frameworks(self):
+    def _discover_frameworks(self) -> list[str]:
         return sorted(set([cls.__name__.removesuffix("Manager").lower() for cls in all_subclasses(Template)]))
 
-    def run(self):
+    def run(self) -> None:
         framework = self.framework_manager(self.args.name)
         #
         if hasattr(self.framework_manager, "install_framework"):
@@ -56,7 +51,7 @@ class Main:
         if hasattr(self.framework_manager, "create_example"):
             framework.create_example(self.args.example or 1)
 
-def main_entry_point():
+def main_entry_point() -> None:
     Main().run()
 
 

@@ -13,7 +13,7 @@ class Template:
     extra_files: List[str]
     example: bool = True
 
-    def __init_subclass__(cls, **kwargs):
+    def __init_subclass__(cls, **kwargs) -> None:
         super().__init_subclass__(**kwargs)
         cls.framework_name = cls.__name__.lower().removesuffix("manager")
 
@@ -53,15 +53,15 @@ class Template:
         self.extra_files = deepcopy(self.__class__.extra_files)
         self.example = self.__class__.example
         
-    def install_framework(self, _version: Optional[str] = None):
+    def install_framework(self, _version: Optional[str] = None) -> None:
         self.AutoManager.install_libs(
             [f"{self.framework_name}=={_version}"] if _version else [self.framework_name]
             + self.extra_libs)
         self._setup_framework()
 
-    def _setup_framework(self):
+    def _setup_framework(self) -> None:
         if self.extra_dirs:
-            cfg.create_dirs(self.source_dir, self.extra_dirs)
+            cfg.create_dirs(self.extra_dirs)
         if self.extra_files:
             cfg.create_files(self.extra_files)
 

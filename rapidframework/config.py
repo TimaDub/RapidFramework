@@ -1,8 +1,8 @@
 from os import getcwd, listdir, path, makedirs
-from typing import Self, Dict
+from typing import Optional, Self, Dict, List
 import pkgutil
 from msgspec import json, Struct, field, DecodeError
-from subprocess import run
+from subprocess import run, CalledProcessError
 from importlib.metadata import distribution
 from re import sub
 
@@ -28,21 +28,23 @@ class Config:
                 "static/js",
                 "static/images",
             ]
-            self.install = AutoManager().get_config_managers()
-            self.pkg_manager = AutoManager().get_pkg_manager()
+            manager = AutoManager()
+            self.install = manager.get_config_managers()
+            self.pkg_manager = manager.get_pkg_manager()
             self._initialized = True
 
 
-    def create_dirs(self, app_path, extra_dirs=[]) -> None:
+    def create_dirs(self, _dirs_to_create: Optional[List[str]] = None) -> None:
         dirs_to_create: list = self.dirs_to_create.copy()
-        dirs_to_create.extend(extra_dirs)
+        if _dirs_to_create:
+            dirs_to_create.extend(_dirs_to_create)
         #
         for _dir in dirs_to_create:
-            makedirs(path.join(app_path, _dir), exist_ok=True)
+            makedirs(path.join(self.source_dir, _dir), exist_ok=True)
     
-    def create_files(self, file_paths) -> None:
-        for file_path in file_paths:
-            with open(path.join(self.source_dir, file_path), "w"): ...
+    def create_files(self, relative_file_paths: List[str]) -> None:
+        for _relative_path in relative_file_paths:
+            with open(path.join(self.source_dir, _relative_path), "w"): ...
 
     
 class _ConfigCommands(Struct):
@@ -62,7 +64,7 @@ class AutoManager:
             cls._instance = super().__new__(cls)
         return cls._instance
     
-    def __init__(self, config_name: str = "managers.json"):
+    def __init__(self, config_name: str = "managers.json") -> None:
         if not hasattr(self, "_initialized"):
             self.config_name = config_name
             self._ConfigFormat = _ConfigFormat
@@ -87,7 +89,11 @@ class AutoManager:
         pkg = self.get_pkg_manager()
         if pkg not in managers:
             raise ValueError(f"Package manager '{pkg}' not found in configuration.")
-        run([pkg, managers[pkg].install] + libs)
+        try:
+            run([pkg, managers[pkg].install] + libs, check=True)
+        except CalledProcessError as e:
+            print(f"Failed to install packages: {e}")
+
                 
 if __name__ == "__main__":
     # Example usage of AutoManager singleton
