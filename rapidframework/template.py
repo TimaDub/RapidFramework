@@ -1,4 +1,4 @@
-from os import path
+from pathlib import Path
 from .config import AutoManager
 from .config import Config
 from typing import Optional, List
@@ -74,7 +74,7 @@ class Template:
             if example_code is None:
                 raise FileNotFoundError(f"Example {example_id} not found for {self.framework_name} framework.")
 
-            with open(path.join(self.source_dir, f"{self.name}.py"), "w", encoding="utf-8") as f:
+            with open(Path(self.source_dir) / f"{self.name}.py", "w", encoding="utf-8") as f:
                 f.write(example_code.decode("utf-8"))
         else:
             raise NotImplementedError(f"Example creation is not implemented for {self.framework_name} framework.")

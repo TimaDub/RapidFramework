@@ -2,28 +2,27 @@
     "managers": {
         "pip": {
             "install": "install",
-            "uninstall": "uninstall",
-            "list": "freeze"
+            "uninstall": "uninstall"
         },
-        "conda": {
+        "pipx": {
             "install": "install",
-            "uninstall": "uninstall",
-            "list": "list"
-        },
-        "uv": {
-            "install": "add",
-            "uninstall": "remove",
-            "list": "pip list"
+            "uninstall": "uninstall"
         },
         "pyenv": {
             "install": "install",
-            "uninstall": "uninstall",
-            "list": "versions"
+            "uninstall": "uninstall"
+        },
+        "conda": {
+            "install": "install",
+            "uninstall": "uninstall"
+        },
+        "uv": {
+            "install": "add",
+            "uninstall": "remove"
         },
         "poetry": {
             "install": "add",
-            "uninstall": "remove",
-            "list": "show"
+            "uninstall": "remove"
         }
     }
 }

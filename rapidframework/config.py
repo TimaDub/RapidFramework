@@ -1,4 +1,4 @@
-from os import getcwd, listdir, path, makedirs
+from pathlib import Path
 from typing import Optional, Self, Dict, List
 import pkgutil
 from msgspec import json, Struct, field, DecodeError
@@ -17,9 +17,9 @@ class Config:
     
     def __init__(self) -> None:
         if not hasattr(self, "_initialized"):
-            self.source_dir = getcwd()
-            self.project_name = path.basename(self.source_dir)
-            self.source_files = listdir()
+            self.source_dir = Path.cwd()
+            self.source_files = self.source_dir.iterdir()
+            self.project_name = Path(self.source_dir).name
             self.dirs_to_create = [
                 "tests",
                 "templates",
@@ -40,11 +40,11 @@ class Config:
             dirs_to_create.extend(_dirs_to_create)
         #
         for _dir in dirs_to_create:
-            makedirs(path.join(self.source_dir, _dir), exist_ok=True)
+            self.source_dir.mkdir(_dir, exist_ok=True)
     
     def create_files(self, relative_file_paths: List[str]) -> None:
         for _relative_path in relative_file_paths:
-            with open(path.join(self.source_dir, _relative_path), "w"): ...
+            with open(self.source_dir /  _relative_path, "w"): ...
 
     
 class _ConfigCommands(Struct):
