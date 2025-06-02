@@ -2,7 +2,7 @@
 
 > **RapidFramework** is a Python library for quickly creating and setting up projects from templates.
 
-## https://pypi.org/project/rapidframework-lib/1.0.9/
+## https://pypi.org/project/rapidframework-lib/1.1.0/
 
 ## Installation
 
