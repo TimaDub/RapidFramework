@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Optional, Self, Dict, List
 import pkgutil
-from msgspec import json, Struct, field, DecodeError
+from msgspec import json, Struct, DecodeError
 from subprocess import run, CalledProcessError
 from importlib.metadata import distribution
 from re import sub
@@ -40,7 +40,7 @@ class Config:
             dirs_to_create.extend(_dirs_to_create)
         #
         for _dir in dirs_to_create:
-            self.source_dir.mkdir(_dir, exist_ok=True)
+            (self.source_dir / _dir).mkdir(exist_ok=True)
     
     def create_files(self, relative_file_paths: List[str]) -> None:
         for _relative_path in relative_file_paths:
@@ -50,7 +50,6 @@ class Config:
 class _ConfigCommands(Struct):
     install: str
     uninstall: str
-    list_: str = field(name="list")
 
 class _ConfigFormat(Struct):
     managers: Dict[str, _ConfigCommands]
